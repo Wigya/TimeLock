@@ -20,7 +20,7 @@ contract OwnTimeLock {
   event Cancel(bytes32 txId);
   event Response(bool success, bytes data);
   event Queue(address _target, uint _value, bytes _data, string _func, uint _timestamp);
-  event Execute(address _target, uint _value, bytes  _data, string  _func, bytes32 _txId, int _timestamp);
+  event Execute(address _target, uint _value, bytes  _data, string  _func, bytes32 _txId, uint _timestamp);
 
   modifier onlyOwner() {
     require(msg.sender == owner, "Only the owner may execute this function");
@@ -64,6 +64,8 @@ contract OwnTimeLock {
       );
     // queue tx
     isTxIdQueued[txId] = true;
+
+    emit Queue(_target, _value, _data, _func, _timestamp);
   }
 
   function execute(
@@ -106,6 +108,9 @@ contract OwnTimeLock {
     if (!success) revert TxExecutionFailed(success, res);
 
     emit Response(success, res);
+
+    emit Execute(_target, _value, _data, _func, txId ,_timestamp);
+
     return res;
   }
 
